@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/haggen/localthreat/api/web"
 	gonanoid "github.com/matoous/go-nanoid"
 
+	//	"github.com/bwmarrin/discordgo"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -49,7 +51,11 @@ func v1APIHandler(db *pgxpool.Pool) web.Middleware {
 					ID: id,
 				}
 				report.Parse(string(src))
-				data, err := json.Marshal(report)
+				data, err := json.Marshal()(report)
+				if err != nil {
+					panic(err)
+				}
+				err = discordRelay(data)
 				if err != nil {
 					panic(err)
 				}
@@ -123,4 +129,9 @@ func main() {
 	w.Use(v1APIHandler(database))
 
 	w.Listen(":" + os.Getenv("PORT"))
+}
+
+func discordRelay(report []byte) error {
+	fmt.Printf("%s", report)
+	return nil
 }
