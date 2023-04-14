@@ -7,4 +7,4 @@ RUN npm i
 ADD . /usr/local/src
 EXPOSE 3000
 
-CMD ["npm", "run-script", "start"]
+CMD ["npm", "start"]
