@@ -5,6 +5,7 @@ module github.com/haggen/localthreat/api
 go 1.20
 
 require (
+	github.com/bwmarrin/discordgo v0.27.1
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx/v4 v4.8.1
@@ -12,6 +13,7 @@ require (
 )
 
 require (
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.6.4 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -22,6 +24,7 @@ require (
 	github.com/jackc/puddle v1.1.1 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect

@@ -13,12 +13,12 @@ import (
 	"github.com/haggen/localthreat/api/web"
 	gonanoid "github.com/matoous/go-nanoid"
 
-	//	"github.com/bwmarrin/discordgo"
+	"github.com/bwmarrin/discordgo"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-func v1APIHandler(db *pgxpool.Pool) web.Middleware {
+func v1APIHandler(db *pgxpool.Pool, discord *discordgo.Session) web.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if !strings.HasPrefix(r.URL.Path, "/v1/") {
@@ -51,13 +51,18 @@ func v1APIHandler(db *pgxpool.Pool) web.Middleware {
 					ID: id,
 				}
 				report.Parse(string(src))
-				data, err := json.Marshal()(report)
+				data, err := json.Marshal(report)
 				if err != nil {
 					panic(err)
 				}
-				err = discordRelay(data)
-				if err != nil {
-					panic(err)
+				if discord != nil {
+					channel := os.Getenv("DISCORD_CHANNEL")
+					if channel != "" {
+						err = discordRelay(data, channel, discord)
+						if err != nil {
+							panic(err)
+						}
+					}
 				}
 				_, err = db.Exec(context.Background(), `INSERT INTO reports VALUES ($1, $2);`, report.ID, report.Data)
 				if err != nil {
@@ -126,12 +131,23 @@ func main() {
 	w.Use(web.RemoteAddrHandler())
 	w.Use(web.RateLimiterHandler())
 	w.Use(web.CORSHandler())
-	w.Use(v1APIHandler(database))
+	//discord init
+	token := os.Getenv("DISCORD_TOKEN")
+	if token != "" {
+		discord, err := discordgo.New("Bot " + token)
+		if err != nil {
+			log.Fatal(err)
+		}
+		w.Use(v1APIHandler(database, discord))
+	} else {
+		w.Use(v1APIHandler(database, nil))
+	}
 
 	w.Listen(":" + os.Getenv("PORT"))
 }
 
-func discordRelay(report []byte) error {
-	fmt.Printf("%s", report)
-	return nil
+func discordRelay(report []byte, channel string, discord *discordgo.Session) error {
+	fmt.Printf("report is %s", report)
+	_, err := discord.ChannelMessageSend(channel, string(report))
+	return err
 }

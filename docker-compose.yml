@@ -21,6 +21,8 @@ services:
     environment:
       PORT: 5000
       DATABASE_URL: postgres://postgres:123@db/postgres?sslmode=disable
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DISCORD_CHANNEL: 1096135108932665486
   client:
     build: ./client
     ports:
